@@ -1,6 +1,7 @@
 var app = require('electron').app
 var BrowserWindow = require('electron').BrowserWindow
 var fs = require('fs')
+var globalShortcut = require('electron').globalShortcut
 var ipcMain = require('electron').ipcMain
 var path = require('path')
 
@@ -10,6 +11,11 @@ app.on('ready', function () {
   console.log('main log')
   console.warn('main warn')
   console.error('main error')
+
+  global.globalShortcutCount = 0
+  globalShortcut.register('Control+8', function () {
+    global.globalShortcutCount++
+  })
 
   global.mainProcessGlobal = 'foo'
   global.ipcEventCount = 0
@@ -25,6 +31,7 @@ app.on('ready', function () {
 })
 
 app.on('will-quit', function () {
+  globalShortcut.unregisterAll()
   if (fs.existsSync(process.env.SPECTRON_TEMP_DIR)) {
     fs.writeFileSync(path.join(process.env.SPECTRON_TEMP_DIR, 'quit.txt'), '')
   }
